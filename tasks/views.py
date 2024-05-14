@@ -13,45 +13,39 @@ def home(request):
 
 def signup(request):
         if request.method == 'GET':
-                return render(request, 'signup.html', {'form':UserCreationForm})
+                return render(request, 'signup.html', {"form":UserCreationForm})
                 
         else:
-                if request.POST['password1'] == request.POST['password1']:
+                if request.POST["password1"] == request.POST["password2"]:
                         try:
-                                user= User.objects.create_user(username=request.POST['username'],
-                                                                password=request.POST['password1'])
+                                user= User.objects.create_user(
+                                       username=request.POST["username"], password=request.POST['password1'])
                                 user.save()
                                 login(request, user)
                                 return redirect('tasks')
                         except IntegrityError:
                                 return render(
-                                       request, "signup.html",
-                                       {"form": UserCreationForm, "error": "Username already exists"}
+                                       request, 'signup.html', {"form": UserCreationForm, "error": "Username already exists"}
                                 )
-                return render(
-                                 request, 
-                                 "signup.html",
+                return render(request, 'signup.html',
                                        {"form": UserCreationForm, "error": "Password do not match"}
                                 )
 
 @login_required        
 def tasks (request):
        tasks = Task.objects.filter(user=request.user, datecompleted__isnull=True)
-       return render(request, 'tasks.html', {'tasks': tasks})
+       return render(request, 'tasks.html', {"tasks": tasks})
 
 @login_required
 def tasks_completed (request):
        tasks = Task.objects.filter(user=request.user, datecompleted__isnull=False).order_by
        ('-datecompleted')
-       return render(request, 'tasks.html', {'tasks': tasks})
+       return render(request, 'tasks.html', {"tasks": tasks})
 
 @login_required
-def create_task(request):
-              
+def create_task(request):             
         if request.method == 'GET':
-              return render(request, 'create_task.html',{
-                'form': TaskForm}
-                )
+              return render(request, 'create_task.html', {"form": TaskForm})
         else:
                try:
                       form = TaskForm(request.POST)
@@ -61,8 +55,8 @@ def create_task(request):
                       return redirect('tasks')
                except ValueError:
                       return render(request, 'create_task.html',{
-                        'form': TaskForm,
-                        'error': 'Please provide valida data'
+                        "form": TaskForm,
+                        "error": "Please provide valida data"
                       })
 
 @login_required                    
@@ -79,7 +73,7 @@ def task_detail(request, task_id):
                      return redirect('tasks')
               except ValueError:
                      return render(request,'task_detail.html', {'task':task, 'form': form, 
-                                                          'tasks': "Error updatting task"})
+                                                          'tasks': 'Error updatting task'})
 
 @login_required
 def complete_task(request, task_id):
